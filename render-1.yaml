@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: funcaptcha-thinkphp
+    env: docker
+    plan: standard
+    region: oregon
+    
+    # Auto-deploy on git push
+    autoDeploy: true
+    
+    # Build config
+    dockerfilePath: ./Dockerfile.thinkphp
+    
+    # Port configuration
+    port: 8080
+    
+    # Environment variables
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: QUEUE_DRIVER
+        value: redis
+      - key: CACHE_DRIVER
+        value: redis
+    
+    # Health check for Render
+    healthCheckPath: /arkoselabs/health
+    healthCheckProtocol: HTTP
+    
+    # Auto-scaling (optional)
+    scaling:
+      maxInstances: 3
+      minInstances: 1
+      targetMemoryPercent: 80
+      targetCpuPercent: 80
+
+# Cron jobs (optional - for cache cleanup)
+crons:
+  - id: cleanup-cache
+    schedule: "0 2 * * *"  # 2 AM daily
+    command: php think cache:clear
